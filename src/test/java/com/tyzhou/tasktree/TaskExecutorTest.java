@@ -13,7 +13,7 @@ public class TaskExecutorTest {
     public void setUp() throws Exception {
     }
 
-    @Test
+    //@Test
     public void testSubmit() throws InterruptedException {
         TaskA task = new TaskA(null, 123L);
         
@@ -31,4 +31,35 @@ public class TaskExecutorTest {
         System.out.println(executor.getExecutorService().getLargestPoolSize());
     }
 
+    @Test
+    public void testSynchProcess() {
+        SynchProcess process = new SynchProcess();
+        
+        long start = System.currentTimeMillis();
+        for(int i=0; i<100; i++) {
+            try {
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("cost:"+(end-start)+"ms");
+    }
+    
+    @Test
+    public void testTaskProcess() {
+        TaskProcess process = new TaskProcess();
+        
+        long start = System.currentTimeMillis();
+        for(int i=0; i<100; i++) {
+            try {
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("cost:"+(end-start)+"ms");
+    }
 }

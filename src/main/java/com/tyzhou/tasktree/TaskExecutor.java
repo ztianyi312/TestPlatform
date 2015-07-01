@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TaskExecutor {
 
-    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(100, 400, 1, TimeUnit.MINUTES, 
+    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(160, 400, 1, TimeUnit.MINUTES, 
             new LinkedBlockingQueue<Runnable>(100), new ThreadFactory() {
 
         private AtomicInteger id = new AtomicInteger(0);

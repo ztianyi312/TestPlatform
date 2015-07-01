@@ -70,7 +70,7 @@ public class TaskA extends TaskNode<List<Object>>{
             e.printStackTrace();
         }
         
-        System.out.println("taskA out end");
+        System.out.println("taskA run end");
         
         return result;
     }
