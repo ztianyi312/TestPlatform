@@ -25,7 +25,7 @@ public class TaskProcess {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println(executor.getExecutorService().getLargestPoolSize());
+        //System.out.println(executor.getExecutorService().getLargestPoolSize());
     }
     
     public TaskNode newTaskA() {
@@ -33,7 +33,7 @@ public class TaskProcess {
 
             @Override
             protected void prepare() {
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<10; i++) {
                     this.childrenList.add(newTaskB(this));
                 }
             }
@@ -71,7 +71,7 @@ public class TaskProcess {
 
             @Override
             protected void prepare() {
-                for(int i=0; i<4; i++) {
+                for(int i=0; i<10; i++) {
                     this.childrenList.add(newTaskD(this));
                 }
             }
@@ -92,7 +92,7 @@ public class TaskProcess {
             protected Object run() {
                 count.incrementAndGet();
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(2);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

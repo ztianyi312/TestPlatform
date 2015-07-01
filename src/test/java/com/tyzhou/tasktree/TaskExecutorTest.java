@@ -35,9 +35,19 @@ public class TaskExecutorTest {
     public void testSynchProcess() {
         SynchProcess process = new SynchProcess();
         
+        for(int i=0; i<100; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
         long start = System.currentTimeMillis();
         for(int i=0; i<100; i++) {
             try {
+                //System.out.println(i);
                 process.run();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -51,9 +61,19 @@ public class TaskExecutorTest {
     public void testTaskProcess() {
         TaskProcess process = new TaskProcess();
         
+        for(int i=0; i<100; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
         long start = System.currentTimeMillis();
         for(int i=0; i<100; i++) {
             try {
+                //System.out.println(i);
                 process.run();
             } catch (Exception e) {
                 e.printStackTrace();
