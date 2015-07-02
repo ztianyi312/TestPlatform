@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SynchProcess {
 
-    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(50, 150, 1, TimeUnit.MINUTES, 
+    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(100, 100, 1, TimeUnit.MINUTES, 
             new LinkedBlockingQueue<Runnable>(100), new ThreadFactory() {
 
         private AtomicInteger id = new AtomicInteger(0);
@@ -37,6 +37,10 @@ public class SynchProcess {
         //System.out.println(executorService.getLargestPoolSize());
         
         //System.out.println(count.get());
+    }
+    
+    public int getCount() {
+        return count.get();
     }
     
     public Object processA() throws Exception {

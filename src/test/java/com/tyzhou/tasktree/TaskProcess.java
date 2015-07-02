@@ -28,23 +28,23 @@ public class TaskProcess {
         //System.out.println(executor.getExecutorService().getLargestPoolSize());
     }
     
+    public int getCount() {
+        return count.get();
+    }
+    
     public TaskNode newTaskA() {
-        return new TaskNode(null) {
-
-            @Override
-            protected void prepare() {
-                for(int i=0; i<10; i++) {
-                    this.childrenList.add(newTaskB(this));
-                }
-            }
-            
+        TaskNode task = new TaskNode(null) {
             @Override
             protected Object run() {
-                
                 return "A";
             }
             
         };
+        for(int i=0; i<10; i++) {
+            task.childrenList.add(newTaskB(task));
+        }
+
+        return task;
     }
     
     public TaskNode newTaskB(TaskNode parent) {

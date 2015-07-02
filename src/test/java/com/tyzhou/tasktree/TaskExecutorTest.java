@@ -31,7 +31,7 @@ public class TaskExecutorTest {
         System.out.println(executor.getExecutorService().getLargestPoolSize());
     }
 
-    @Test
+    //@Test
     public void testSynchProcess() {
         SynchProcess process = new SynchProcess();
         
@@ -54,6 +54,7 @@ public class TaskExecutorTest {
             }
         }
         long end = System.currentTimeMillis();
+        System.out.println(process.getCount());
         System.out.println("cost:"+(end-start)+"ms");
     }
     
@@ -80,6 +81,34 @@ public class TaskExecutorTest {
             }
         }
         long end = System.currentTimeMillis();
+        System.out.println(process.getCount());
+        System.out.println("cost:"+(end-start)+"ms");
+    }
+    
+    @Test
+    public void testGuavaProcess() {
+        GuavaProcess process = new GuavaProcess();
+        
+        for(int i=0; i<100; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        long start = System.currentTimeMillis();
+        for(int i=0; i<100; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println(process.getCount());
         System.out.println("cost:"+(end-start)+"ms");
     }
 }
