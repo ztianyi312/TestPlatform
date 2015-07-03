@@ -13,9 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TaskProcess {
 
-    private TaskExecutor executor = new TaskExecutor();
+    private TaskExecutor executor ;
     
     private AtomicInteger count = new AtomicInteger();
+    
+    public TaskProcess(ThreadPoolExecutor executorService) {
+        executor = new TaskExecutor(executorService);
+    }
     
     public void run() {
         TaskFuture future = executor.submit(newTaskA());
@@ -35,14 +39,19 @@ public class TaskProcess {
     public TaskNode newTaskA() {
         TaskNode task = new TaskNode(null) {
             @Override
+            protected void prepare() {
+                for(int i=0; i<10; i++) {
+                    this.childrenList.add(newTaskB(this));
+                }
+            }
+            
+            @Override
             protected Object run() {
                 return "A";
             }
             
         };
-        for(int i=0; i<10; i++) {
-            task.childrenList.add(newTaskB(task));
-        }
+
 
         return task;
     }
@@ -91,11 +100,12 @@ public class TaskProcess {
             @Override
             protected Object run() {
                 count.incrementAndGet();
-                    try {
-                        Thread.sleep(2);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    Thread.sleep(2);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 return "D";
             }
             

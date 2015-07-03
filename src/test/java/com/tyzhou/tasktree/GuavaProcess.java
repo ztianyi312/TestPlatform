@@ -11,6 +11,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.runner.Description;
+import org.junit.runner.Runner;
+import org.junit.runner.notification.RunNotifier;
+
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.AsyncFunction;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -31,19 +37,9 @@ public class GuavaProcess {
     
     private AtomicInteger count = new AtomicInteger();
     
-    public GuavaProcess() {
+    public GuavaProcess(ThreadPoolExecutor executorService) {
         
-        executorService = new ThreadPoolExecutor(400, 400, 1, TimeUnit.MINUTES, 
-                new LinkedBlockingQueue<Runnable>(400), new ThreadFactory() {
-
-            private AtomicInteger id = new AtomicInteger(0);
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r);
-                thread.setName("TaskExecutor-" + id.addAndGet(1));
-                return thread;
-            }
-        }, new ThreadPoolExecutor.CallerRunsPolicy());
+        this.executorService = executorService;
         
         service = MoreExecutors.listeningDecorator(executorService);
     }
@@ -70,51 +66,42 @@ public class GuavaProcess {
             futures[i] = future;
         }
         
-        ListenableFutureTask<List<Object>> result =  ListenableFutureTask.create(new Callable<List<Object>>(){
+        AsyncFunction<List<List<Object>>, List<Object>> function = new AsyncFunction<List<List<Object>>,List<Object>>(){
 
             @Override
-            public List<Object> call() throws Exception {
-                for(int i=0; i<10; i++) {
-                    futures[i].get();
-                }
-                
-                return futures[0].get();
-                //return Collections.EMPTY_LIST;
+            public ListenableFuture<List<Object>> apply(List<List<Object>> input) {
+                return futures[0];
             }
             
-        });
-        
-        service.submit(result);
-        
-        return result;
+        };
+        ListenableFuture<List<List<Object>>> successfulQueries = Futures.allAsList(futures);
+        return Futures.transform(successfulQueries, function);
+
     }
     
     
     public ListenableFuture<List<Object>> processB() throws Exception {
         
         final ListenableFuture<List<Object>>[] futures = new ListenableFuture[10];
+        
         for(int i=0; i<10; i++) {
             ListenableFuture<List<Object>> future = processC();
             futures[i] = future;
         }
+       
         
-        ListenableFutureTask<List<Object>> result = ListenableFutureTask.create(new Callable<List<Object>>(){
+        AsyncFunction<List<List<Object>>, List<Object>> function = new AsyncFunction<List<List<Object>>,List<Object>>(){
 
             @Override
-            public List<Object> call() throws Exception {
-                for(int i=0; i<10; i++) {
-                    futures[i].get();
-                }
-                
-                return futures[0].get();
-                //return Collections.EMPTY_LIST;
+            public ListenableFuture<List<Object>> apply(List<List<Object>> input) {
+                // TODO Auto-generated method stub
+                return futures[0];
             }
             
-        });
-        
-        service.submit(result);
+        };
+        ListenableFuture<List<List<Object>>> successfulQueries = Futures.allAsList(futures);
+        return Futures.transform(successfulQueries, function);
 
-        return result;
     }
     
     public ListenableFuture<List<Object>> processC() throws Exception {
@@ -135,22 +122,6 @@ public class GuavaProcess {
             });
             queries.add(future);
         }
-        
-        ListenableFutureTask<List<Object>> result = ListenableFutureTask.create(new Callable<List<Object>>(){
-
-            @Override
-            public List<Object> call() throws Exception {
-                for(int i=0; i<10; i++) {
-                    queries.get(i).get();
-                }
-                
-                //return queries.get(0).get();
-                return Collections.EMPTY_LIST;
-            }
-            
-        });
-        
-        //service.submit(result);
         
         ListenableFuture<List<Object>> successfulQueries = Futures.allAsList(queries);
 

@@ -16,17 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TaskExecutor {
 
-    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(400, 400, 1, TimeUnit.MINUTES, 
-            new LinkedBlockingQueue<Runnable>(400), new ThreadFactory() {
-
-        private AtomicInteger id = new AtomicInteger(0);
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setName("TaskExecutor-" + id.addAndGet(1));
-            return thread;
-        }
-    }, new ThreadPoolExecutor.CallerRunsPolicy());
+    private ThreadPoolExecutor executorService;
+    
+    public TaskExecutor(ThreadPoolExecutor executorService) {
+        this.executorService = executorService;
+    }
     
     private static ThreadLocal<TaskNode> context = new ThreadLocal<>();
     

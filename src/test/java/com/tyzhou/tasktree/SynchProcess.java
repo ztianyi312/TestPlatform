@@ -18,19 +18,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SynchProcess {
 
-    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(100, 100, 1, TimeUnit.MINUTES, 
-            new LinkedBlockingQueue<Runnable>(100), new ThreadFactory() {
-
-        private AtomicInteger id = new AtomicInteger(0);
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setName("TaskExecutor-" + id.addAndGet(1));
-            return thread;
-        }
-    }, new ThreadPoolExecutor.CallerRunsPolicy());
+    private ThreadPoolExecutor executorService;
     
     private AtomicInteger count = new AtomicInteger();
+    
+    public SynchProcess(ThreadPoolExecutor executorService){
+        this.executorService = executorService;
+    }
     
     public void run() throws Exception {
         processA();
