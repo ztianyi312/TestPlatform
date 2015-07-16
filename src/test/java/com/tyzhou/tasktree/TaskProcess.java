@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * 
@@ -100,12 +101,8 @@ public class TaskProcess {
             @Override
             protected Object run() {
                 count.incrementAndGet();
-                try {
-                    Thread.sleep(2);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                LockSupport.parkNanos(1000000);
+                //Thread.yield();
                 return "D";
             }
             

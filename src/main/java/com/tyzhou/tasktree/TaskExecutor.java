@@ -74,6 +74,7 @@ public class TaskExecutor {
                 }
                 
             }
+            taskNode.childrenList = null;// to reduce footprint
         } else {
             doTask(taskNode);
         }

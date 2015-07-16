@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public class TaskExecutorTest {
 
-    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(400, 400, 1, TimeUnit.MINUTES, 
+    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(100, 100, 1, TimeUnit.MINUTES, 
             new LinkedBlockingQueue<Runnable>(400), new ThreadFactory() {
 
         private AtomicInteger id = new AtomicInteger(0);
@@ -131,5 +131,32 @@ public class TaskExecutorTest {
         long end = System.currentTimeMillis();
         System.out.println(process.getCount());
         System.out.println("TaskProcess cost:"+(end-start)+"ms");
+    }
+    
+    //@Test
+    public void testDisruptorProcess() {
+        DisruptorProcess process = new DisruptorProcess(executorService);
+        
+        for(int i=0; i<200; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        long start = System.currentTimeMillis();
+        for(int i=0; i<100; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println(process.getCount());
+        System.out.println("DisruptorProcess cost:"+(end-start)+"ms");
     }
 }

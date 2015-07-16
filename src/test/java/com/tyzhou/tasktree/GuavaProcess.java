@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -65,7 +66,7 @@ public class GuavaProcess {
             ListenableFuture<List<Object>> future = processB();
             futures[i] = future;
         }
-        
+
         AsyncFunction<List<List<Object>>, List<Object>> function = new AsyncFunction<List<List<Object>>,List<Object>>(){
 
             @Override
@@ -76,7 +77,7 @@ public class GuavaProcess {
         };
         ListenableFuture<List<List<Object>>> successfulQueries = Futures.allAsList(futures);
         return Futures.transform(successfulQueries, function);
-
+        
     }
     
     
@@ -89,7 +90,7 @@ public class GuavaProcess {
             futures[i] = future;
         }
        
-        
+       
         AsyncFunction<List<List<Object>>, List<Object>> function = new AsyncFunction<List<List<Object>>,List<Object>>(){
 
             @Override
@@ -101,7 +102,7 @@ public class GuavaProcess {
         };
         ListenableFuture<List<List<Object>>> successfulQueries = Futures.allAsList(futures);
         return Futures.transform(successfulQueries, function);
-
+        
     }
     
     public ListenableFuture<List<Object>> processC() throws Exception {
@@ -114,7 +115,8 @@ public class GuavaProcess {
                 public Object call() throws Exception {
                     
                     count.incrementAndGet();
-                    Thread.sleep(2);
+                    LockSupport.parkNanos(1000000);
+                    //Thread.yield();
                     return 1;
 
                 }
