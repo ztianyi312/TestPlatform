@@ -8,21 +8,16 @@ import java.util.List;
  * @author zhoutianji
  *
  */
-public class TaskC extends TaskNode<List<Object>>{
+public class TaskC extends TaskNode<List<Long>>{
 
-    private List<Long> userIdList;
-
-    public TaskC(TaskNode parentNode, List<Long> userIdList) {
-        super(parentNode);
-        
-        this.userIdList = userIdList;
+    public TaskC() {
+        init();
     }
-    
 
     @Override
-    public List<Object> run() {
+    public List<Long> run() {
         System.out.println(Thread.currentThread()+" taskC out start");
-        List<Object> result = new ArrayList<>();
+        List<Long> result = new ArrayList<>();
         
         try {
             Thread.sleep(500);

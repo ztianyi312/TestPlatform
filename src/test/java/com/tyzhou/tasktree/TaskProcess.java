@@ -38,34 +38,25 @@ public class TaskProcess {
     }
     
     public TaskNode newTaskA() {
-        TaskNode task = new TaskNode(null) {
-            @Override
-            protected void prepare() {
-                for(int i=0; i<10; i++) {
-                    this.childrenList.add(newTaskB(this));
-                }
-            }
-            
+        
+        
+        TaskNode task = new TaskNode() {
             @Override
             protected Object run() {
                 return "A";
             }
             
         };
-
+        
+        for(int i=0; i<10; i++) {
+            task.addChild(newTaskB());
+        }
 
         return task;
     }
     
-    public TaskNode newTaskB(TaskNode parent) {
-        return new TaskNode(parent) {
-
-            @Override
-            protected void prepare() {
-                for(int i=0; i<10; i++) {
-                    this.childrenList.add(newTaskC(this));
-                }
-            }
+    public TaskNode newTaskB() {
+        TaskNode task = new TaskNode() {
             
             @Override
             protected Object run() {
@@ -74,18 +65,16 @@ public class TaskProcess {
             }
             
         };
+        
+        for(int i=0; i<10; i++) {
+            task.addChild(newTaskC());
+        }
+
+        return task;
     }
     
-    public TaskNode newTaskC(TaskNode parent) {
-        return new TaskNode(parent) {
-
-            @Override
-            protected void prepare() {
-                for(int i=0; i<10; i++) {
-                    this.childrenList.add(newTaskD(this));
-                }
-            }
-            
+    public TaskNode newTaskC() {
+        TaskNode task = new TaskNode() {
             @Override
             protected Object run() {
                 
@@ -93,16 +82,22 @@ public class TaskProcess {
             }
             
         };
+        
+        for(int i=0; i<10; i++) {
+            task.addChild(newTaskD());
+        }
+        
+        return task;
     }
     
-    public TaskNode newTaskD(TaskNode parent) {
-        return new TaskNode(parent) {
+    public TaskNode newTaskD() {
+        return new TaskNode() {
 
             @Override
             protected Object run() {
                 count.incrementAndGet();
-                LockSupport.parkNanos(1000000);
-                //Thread.yield();
+                //LockSupport.parkNanos(1000000);
+                Thread.yield();
                 return "D";
             }
             

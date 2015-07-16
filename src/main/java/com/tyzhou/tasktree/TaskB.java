@@ -9,22 +9,14 @@ import java.util.List;
  *
  */
 public class TaskB extends TaskNode<List<Object>>{
-    
-    private List<Long> userIdList;
 
-    public TaskB(TaskNode parentNode, List<Long> userIdList) {
-        super(parentNode);
-        
-        this.userIdList = userIdList;
-    }
     
     private TaskNode<List<Long>> taskB1;
     
     private TaskNode<List<Long>> taskB2;
     
-    @Override
-    public void prepare() {
-        taskB2 = new TaskNode<List<Long>>(this){
+    public TaskB(final TaskNode<List<Long>> child) {
+        taskB2 = new TaskNode<List<Long>>(){
 
             @Override
             protected List<Long> run() {
@@ -36,7 +28,7 @@ public class TaskB extends TaskNode<List<Object>>{
                     e.printStackTrace();
                 }
                 System.out.println("taskB2 run end");
-                return userIdList;
+                return child.getResult();
             }
 
             
@@ -45,19 +37,7 @@ public class TaskB extends TaskNode<List<Object>>{
         
         
         
-        taskB1 = new TaskNode<List<Long>>(this){
-
-            @Override
-            protected void prepare(){
-                System.out.println(Thread.currentThread()+" taskB1 prepare start");
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                System.out.println("taskB1 prepare end");
-            }
+        taskB1 = new TaskNode<List<Long>>(){
             
             @Override
             protected List<Long> run() {
@@ -69,12 +49,20 @@ public class TaskB extends TaskNode<List<Object>>{
                     e.printStackTrace();
                 }
                 System.out.println("taskB1 run end");
-                return userIdList;
+                return child.getResult();
             }
             
         };
-        childrenList.add(taskB1);
-        childrenList.add(taskB2);
+        this.addChild(taskB1);
+        this.addChild(taskB2);
+        
+        taskB1.addChild(child);
+        taskB2.addChild(child);
+        
+        this.init();
+        taskB1.init();
+        taskB2.init();
+        
     }
 
     @Override

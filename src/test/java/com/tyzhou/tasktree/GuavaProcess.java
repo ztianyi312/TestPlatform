@@ -115,8 +115,8 @@ public class GuavaProcess {
                 public Object call() throws Exception {
                     
                     count.incrementAndGet();
-                    LockSupport.parkNanos(1000000);
-                    //Thread.yield();
+                    //LockSupport.parkNanos(1000000);
+                    Thread.yield();
                     return 1;
 
                 }

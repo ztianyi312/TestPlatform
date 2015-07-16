@@ -22,7 +22,7 @@ public class TaskExecutor {
         this.executorService = executorService;
     }
     
-    private static ThreadLocal<TaskNode> context = new ThreadLocal<>();
+    //private static ThreadLocal<TaskNode> context = new ThreadLocal<>();
     
     public TaskFuture submit(final TaskNode taskNode) {
         if(taskNode == null) {
@@ -42,9 +42,12 @@ public class TaskExecutor {
         queue.addFirst(taskNode);
         
         while(parentCount > 0) {
-            TaskNode last = queue.removeLast();
+            TaskNode last = queue.removeFirst();
             System.out.println(last);
-            queue.addAll(last.getChildren());
+            
+            if(last.getChildren() != null) {
+                queue.addAll(last.getChildren());
+            }
             
             if(--parentCount == 0) {
                 System.out.println();
@@ -54,33 +57,22 @@ public class TaskExecutor {
     }
     
     protected void prepareTask(final TaskNode taskNode) {
-        taskNode.init();
-        List<TaskNode> children = taskNode.getChildren();
-        int size = children.size();
-        if(children != null && size > 0) {
-            int count = 0;
-            for(final TaskNode task : children) {
-                if(++count == size) {
-                    prepareTask(task);
-                }else {
-                    executorService.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            context.set(task);
-                            prepareTask(task);
-                        }
-                    
-                    });
-                }
-                
-            }
-            taskNode.childrenList = null;// to reduce footprint
-        } else {
-            doTask(taskNode);
+        List<TaskNode> leafList = taskNode.getLeafList();
+        for(int i=0; i<leafList.size()-1; i++) {
+            
+            runTask(leafList.get(i));
+        }
+        TaskNode last = leafList.get(leafList.size()-1);
+        if(last.start()) {
+            doTask(last);
         }
     }
     
     protected void runTask(final TaskNode taskNode) {
+        
+        if(!taskNode.start()) {
+            return;
+        }
         executorService.submit(new Runnable() {
             @Override
             public void run() {
@@ -91,13 +83,29 @@ public class TaskExecutor {
     }
     
     protected void doTask(final TaskNode taskNode) {
-        if(taskNode.execute() == 0 && taskNode.getParent() != null) {
-            doTask(taskNode.getParent());
-        } else {
-            if(taskNode.getParent() == null) {
-                taskNode.future.setKeyNode(context.get());
+        taskNode.execute();
+        if(taskNode.getParentList().size() > 0) {
+            List<TaskNode> parentList = taskNode.getParentList();
+            TaskNode currentTask = null;
+            
+            for(final TaskNode parentNode : parentList) {  
+                
+                if(parentNode.waitCount.decrementAndGet() == 0) {
+                    if(currentTask == null) {
+                        currentTask = parentNode;
+                    }else {
+                        runTask(parentNode);
+                    }
+                } 
             }
-            context.remove();
+            
+            if(currentTask != null && currentTask.start()) {
+                doTask(currentTask);
+            }
+            
+        } else {
+            //taskNode.future.setKeyNode(context.get());
+            //context.remove();
         }
     }
 

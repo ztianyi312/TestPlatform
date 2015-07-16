@@ -3,6 +3,7 @@ package com.tyzhou.tasktree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * 
@@ -18,34 +19,43 @@ public class TaskA extends TaskNode<List<Object>>{
     private TaskC taskC;
 
 
-    public TaskA(TaskNode parentNode, long id) {
-        super(parentNode);
+    public TaskA(long id) {
         
-        
+        prepare();
     }
     
-    @Override
     public void prepare() {
         
         System.out.println(Thread.currentThread()+" taskA prepare start");
         
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        TaskNode<List<Long>> task = new TaskNode() {
+
+            @Override
+            protected List<Long> run() {
+                
+                System.out.println("task run start:");
+                LockSupport.parkNanos(100000000);
+                List<Long> userIdList = new ArrayList<>();
+                userIdList.add(1L);
+                userIdList.add(2L);
+                
+                System.out.println("task run end:");
+                return userIdList;
+                
+            }
+            
+        };
+        task.init();
         
-        userIdList = new ArrayList<>();
-        userIdList.add(1L);
-        userIdList.add(2L);
         
-        taskB = new TaskB(this, userIdList);
         
-        taskC = new TaskC(this, userIdList);
+        taskB = new TaskB(task);
+        
+        taskC = new TaskC();
           
-        childrenList.add(taskB);
-        childrenList.add(taskC);
+        this.addChild(taskB);
+        this.addChild(taskC);
+        this.init();
         
         System.out.println("taskA prepare end");
     }
@@ -58,7 +68,7 @@ public class TaskA extends TaskNode<List<Object>>{
         List<Object>result = new ArrayList<>();
         
         List<Object> listB = taskB.getResult();
-        List<Object> listC = taskC.getResult();
+        List<Long> listC = taskC.getResult();
         
         result.add(listB);
         result.add(listC);

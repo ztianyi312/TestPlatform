@@ -13,7 +13,7 @@ import org.junit.Test;
 
 public class TaskExecutorTest {
 
-    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(100, 100, 1, TimeUnit.MINUTES, 
+    private ThreadPoolExecutor executorService = new ThreadPoolExecutor(50, 50, 1, TimeUnit.MINUTES, 
             new LinkedBlockingQueue<Runnable>(400), new ThreadFactory() {
 
         private AtomicInteger id = new AtomicInteger(0);
@@ -34,7 +34,7 @@ public class TaskExecutorTest {
 
     //@Test
     public void testSubmit() throws InterruptedException {
-        TaskA task = new TaskA(null, 123L);
+        TaskA task = new TaskA(123L);
         
         long start = System.currentTimeMillis();
         TaskFuture future = executor.submit(task);

@@ -3,6 +3,7 @@ package com.tyzhou.tasktree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -25,42 +26,57 @@ public abstract class TaskNode<T> {
     
     private volatile TaskStatus status = TaskStatus.wait;
     
-    private TaskNode parent;
+    protected List<TaskNode> parentList = new ArrayList<>();
     
-    protected List<TaskNode> childrenList = new ArrayList<>();
+    protected List<TaskNode> childrenList;
     
     protected AtomicInteger waitCount;
+    
+    private AtomicBoolean startFlag = new AtomicBoolean(false);
     
     protected TaskFuture future;
     
     protected T result;
     
-    public TaskNode(TaskNode parentNode){
-        parent = parentNode;
+    public TaskNode(){
+
+    }
+    
+    public void addChild(TaskNode child) {
+        if(child == null) {
+            return;
+        }
+        
+        if(childrenList == null) {
+            childrenList = new ArrayList<>();
+        }
+        
+        childrenList.add(child);
+        child.parentList.add(this);
     }
     
     protected void init() {
-        try{
-            prepare();
-        }catch(Exception e) {
-            logger.error("task prepare failed : "+this, e);
-        }
-        if(childrenList != null && childrenList.size() >0) {
-            this.waitCount = new AtomicInteger(childrenList.size());
+        
+        if(childrenList != null) {
+            waitCount = new AtomicInteger(childrenList.size());
         }
     }
     
-    /**
-     * before child complete
-     */
-    protected void prepare(){};
+    protected boolean start() {
+        
+        return startFlag.compareAndSet(false, true);
+    }
+    
+    protected int increaseWaitCount() {
+        return waitCount.incrementAndGet();
+    }
     
     /**
      * after child complete
      */
     protected abstract T run();
     
-    protected int execute() {
+    protected void execute() {
         try{
             result = run();
         }catch(Exception e) {
@@ -69,12 +85,6 @@ public abstract class TaskNode<T> {
         if(future != null) {
             future.countDown(getResult());
         } 
-        
-        if(parent == null || parent.waitCount == null) {
-            return 0;
-        }
-        
-        return parent.waitCount.decrementAndGet();
     }
     
     
@@ -83,11 +93,26 @@ public abstract class TaskNode<T> {
         return childrenList;
     }
     
+    public List<TaskNode> getLeafList() {
+        List<TaskNode> leafList = new ArrayList<>();
+        if(childrenList != null) {
+            for(TaskNode child : childrenList) {
+                leafList.addAll(child.getLeafList());
+            }
+        }
+        if(leafList.size() == 0) {
+            leafList.add(this);
+        }
+        this.init();
+        
+        return leafList;
+    }
+    
     public T getResult() {
         return result;
     }
     
-    public TaskNode getParent() {
-        return this.parent;
+    public List<TaskNode> getParentList() {
+        return this.parentList;
     }
 }
