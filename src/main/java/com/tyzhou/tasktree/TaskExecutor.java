@@ -1,5 +1,6 @@
 package com.tyzhou.tasktree;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +23,7 @@ public class TaskExecutor {
         this.executorService = executorService;
     }
     
-    //private static ThreadLocal<TaskNode> context = new ThreadLocal<>();
+    private static ThreadLocal<TaskNode> context = new ThreadLocal<>();
     
     public TaskFuture submit(final TaskNode taskNode) {
         if(taskNode == null) {
@@ -56,26 +57,54 @@ public class TaskExecutor {
         }
     }
     
-    protected void prepareTask(final TaskNode taskNode) {
-        List<TaskNode> leafList = taskNode.getLeafList();
-        for(int i=0; i<leafList.size()-1; i++) {
-            
-            runTask(leafList.get(i));
+    public List<TaskNode> findLeafNode(final TaskNode taskNode, List<TaskNode> leafList) {
+        taskNode.init();
+        List<TaskNode> children = taskNode.getChildren();
+        if(children == null || children.size() == 0) {
+            leafList.add(taskNode);
+        } else {
+            for(final TaskNode child : children) {
+                findLeafNode(child, leafList);
+            }
         }
-        TaskNode last = leafList.get(leafList.size()-1);
-        if(last.start()) {
-            doTask(last);
+        
+        return leafList;
+    }
+    
+    protected void prepareTask(final TaskNode taskNode) {
+        List<TaskNode> leafList = findLeafNode(taskNode, new ArrayList<TaskNode>());
+        
+        TaskNode lastSyncNode = null;
+        
+        for(int i=0; i<leafList.size(); i++) {
+            
+            TaskNode currentNode = leafList.get(i);
+            if(!currentNode.start()) {
+                continue;
+            }
+            
+            if(leafList.get(i).isAsync()) {
+                doTask(currentNode);
+            } else if(lastSyncNode != null) {
+                runTask(currentNode);
+            } else {
+                lastSyncNode = currentNode;
+            }
+            
+        }
+
+        if(lastSyncNode != null) {
+            context.set(lastSyncNode);
+            doTask(lastSyncNode);
         }
     }
     
     protected void runTask(final TaskNode taskNode) {
-        
-        if(!taskNode.start()) {
-            return;
-        }
+
         executorService.submit(new Runnable() {
             @Override
             public void run() {
+                context.set(taskNode);
                 doTask(taskNode);
             }
         
@@ -83,30 +112,41 @@ public class TaskExecutor {
     }
     
     protected void doTask(final TaskNode taskNode) {
-        taskNode.execute();
-        if(taskNode.getParentList().size() > 0) {
-            List<TaskNode> parentList = taskNode.getParentList();
-            TaskNode currentTask = null;
+        Runnable callback = new Runnable(){
+            @Override
+            public void run() {
             
-            for(final TaskNode parentNode : parentList) {  
-                
-                if(parentNode.waitCount.decrementAndGet() == 0) {
-                    if(currentTask == null) {
-                        currentTask = parentNode;
-                    }else {
-                        runTask(parentNode);
+                if(taskNode.getParentList().size() > 0) {
+                    List<TaskNode> parentList = taskNode.getParentList();
+                    TaskNode currentTask = null;
+                    
+                    for(final TaskNode parentNode : parentList) {  
+                        
+                        if(parentNode.waitCount.decrementAndGet() == 0) {
+                            if(currentTask == null && !taskNode.isAsync()) {
+                                currentTask = parentNode;
+                            }else {
+                                runTask(parentNode);
+                            }
+                        } 
                     }
-                } 
+                    
+                    if(currentTask != null) {
+                        doTask(currentTask);
+                    } else {
+                        context.remove();
+                    }
+                    
+                } else {
+                    taskNode.future.setKeyNode(context.get());
+                    context.remove();
+                }
             }
             
-            if(currentTask != null && currentTask.start()) {
-                doTask(currentTask);
-            }
-            
-        } else {
-            //taskNode.future.setKeyNode(context.get());
-            //context.remove();
-        }
+        };
+        
+        taskNode.execute(callback);
+        
     }
 
     public ThreadPoolExecutor getExecutorService() {

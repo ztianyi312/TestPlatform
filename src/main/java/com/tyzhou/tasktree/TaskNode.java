@@ -76,9 +76,10 @@ public abstract class TaskNode<T> {
      */
     protected abstract T run();
     
-    protected void execute() {
+    protected void execute(Runnable callback) {
         try{
             result = run();
+            callback.run();
         }catch(Exception e) {
             logger.error("task run failed : "+this, e);
         }
@@ -93,26 +94,15 @@ public abstract class TaskNode<T> {
         return childrenList;
     }
     
-    public List<TaskNode> getLeafList() {
-        List<TaskNode> leafList = new ArrayList<>();
-        if(childrenList != null) {
-            for(TaskNode child : childrenList) {
-                leafList.addAll(child.getLeafList());
-            }
-        }
-        if(leafList.size() == 0) {
-            leafList.add(this);
-        }
-        this.init();
-        
-        return leafList;
-    }
-    
     public T getResult() {
         return result;
     }
     
     public List<TaskNode> getParentList() {
         return this.parentList;
+    }
+    
+    public boolean isAsync() {
+        return false;
     }
 }

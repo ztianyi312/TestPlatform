@@ -22,7 +22,7 @@ public class TaskB extends TaskNode<List<Object>>{
             protected List<Long> run() {
                 System.out.println(Thread.currentThread()+" taskB2 run start");
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
