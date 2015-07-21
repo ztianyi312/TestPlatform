@@ -75,9 +75,9 @@ public class SimpleREST extends AbstractVerticle {
             conn->{
              // Now chain some statements using flatmap composition
                 Observable<ResultSet> resa = conn.updateObservable("create table test(id int primary key, name varchar(255))").
-                    flatMap(result -> conn.updateObservable("insert into test values(1, 'Hello')")).
-                    flatMap(result -> conn.updateObservable("insert into test values(2, 'Hello2')")).
-                    flatMap(result -> conn.queryObservable("SELECT * FROM test"));
+                    flatMap(result -> conn.updateObservable("insert into test values(1, 'Hello')"), 2).
+                    flatMap(result -> conn.updateObservable("insert into test values(2, 'Hello2')"),2).
+                    flatMap(result -> conn.queryObservable("SELECT * FROM test"),2);
                 
                 
 
@@ -96,7 +96,7 @@ public class SimpleREST extends AbstractVerticle {
             );
 
 
-    vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+    //vertx.createHttpServer().requestHandler(router::accept).listen(8080);
   }
 
   private void handleGetProduct(RoutingContext routingContext) {

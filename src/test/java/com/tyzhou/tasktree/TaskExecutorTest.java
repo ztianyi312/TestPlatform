@@ -133,6 +133,33 @@ public class TaskExecutorTest {
         System.out.println("TaskProcess cost:"+(end-start)+"ms");
     }
     
+    @Test
+    public void testRxJavaProcess() {
+        RxJavaProcess process = new RxJavaProcess(executorService);
+        
+        for(int i=0; i<200; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        long start = System.currentTimeMillis();
+        for(int i=0; i<100; i++) {
+            try {
+                //System.out.println(i);
+                process.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println(process.getCount());
+        System.out.println("RxJavaProcess cost:"+(end-start)+"ms");
+    }
+    
     //@Test
     public void testDisruptorProcess() {
         DisruptorProcess process = new DisruptorProcess(executorService);
