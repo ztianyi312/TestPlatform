@@ -74,16 +74,16 @@ public class SimpleREST extends AbstractVerticle {
     client.getConnectionObservable().subscribe(
             conn->{
              // Now chain some statements using flatmap composition
-                Observable<ResultSet> resa = conn.updateObservable("create table test(id int primary key, name varchar(255))").
+                Observable<JsonObject> resa = conn.updateObservable("create table test(id int primary key, name varchar(255))").
                     flatMap(result -> conn.updateObservable("insert into test values(1, 'Hello')"), 2).
                     flatMap(result -> conn.updateObservable("insert into test values(2, 'Hello2')"),2).
-                    flatMap(result -> conn.queryObservable("SELECT * FROM test"),2);
+                    flatMap(result -> conn.queryObservable("SELECT * FROM test").flatMap(resultSet->Observable.from(resultSet.getRows()),2),2);
                 
                 
 
                 // Subscribe to the final result
-                resa.subscribe(resultSet -> {
-                  System.out.println("Results : " + resultSet.getRows());
+                resa.subscribe(obj -> {
+                  System.out.println("Results : " + obj);
                 });
                 Observable<ResultSet> resb = conn.queryObservable("SELECT * FROM test");
                 resb.subscribe(resultSet -> {
