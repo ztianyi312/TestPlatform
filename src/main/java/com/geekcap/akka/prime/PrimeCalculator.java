@@ -1,6 +1,11 @@
 package com.geekcap.akka.prime;
 
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.actor.UntypedActor;
+import akka.actor.UntypedActorFactory;
+
 import com.geekcap.akka.prime.message.NumberRangeMessage;
 
 public class PrimeCalculator

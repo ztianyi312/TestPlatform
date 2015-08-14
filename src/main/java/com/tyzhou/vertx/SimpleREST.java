@@ -16,18 +16,15 @@
 
 package com.tyzhou.vertx;
 
-import io.vertx.rxjava.core.AbstractVerticle;
-import io.vertx.rxjava.core.Vertx;
-import io.vertx.rxjava.core.http.HttpServerResponse;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.UpdateResult;
-import io.vertx.rx.java.ObservableHandler;
-import io.vertx.rx.java.RxHelper;
+import io.vertx.rxjava.core.AbstractVerticle;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.core.http.HttpServerResponse;
 import io.vertx.rxjava.ext.jdbc.JDBCClient;
 import io.vertx.rxjava.ext.sql.SQLConnection;
 import io.vertx.rxjava.ext.web.Router;

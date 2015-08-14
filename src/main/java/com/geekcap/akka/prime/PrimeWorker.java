@@ -1,6 +1,7 @@
 package com.geekcap.akka.prime;
 
 import akka.actor.UntypedActor;
+
 import com.geekcap.akka.prime.message.NumberRangeMessage;
 import com.geekcap.akka.prime.message.Result;
 

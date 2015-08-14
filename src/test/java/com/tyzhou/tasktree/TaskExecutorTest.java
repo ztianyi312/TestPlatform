@@ -1,7 +1,5 @@
 package com.tyzhou.tasktree;
 
-import static org.junit.Assert.*;
-
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;

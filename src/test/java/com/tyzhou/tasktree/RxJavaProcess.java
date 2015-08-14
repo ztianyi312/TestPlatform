@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.LockSupport;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.Observable.OnSubscribe;
+import rx.Subscriber;
 import rx.functions.Action2;
 import rx.functions.Func0;
 import rx.functions.Func2;

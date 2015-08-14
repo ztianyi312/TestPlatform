@@ -1,6 +1,5 @@
 package com.tyzhou.pojo;
 
-import io.netty.util.internal.StringUtil;
 
 /**
  * 

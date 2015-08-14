@@ -5,13 +5,11 @@ import java.util.concurrent.locks.LockSupport;
 
 import rx.Observable;
 import rx.Observable.OnSubscribe;
-import rx.Observable.Operator;
 import rx.Observer;
 import rx.Scheduler;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func0;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.util.async.Async;
 

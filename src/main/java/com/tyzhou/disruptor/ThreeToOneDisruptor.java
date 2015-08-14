@@ -1,15 +1,14 @@
 package com.tyzhou.disruptor;
 
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.EventTranslator;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.tyzhou.disruptor.ThreeToOneDisruptor.DataEvent;
-import com.tyzhou.tasktree.DisruptorProcess.LongEvent;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ThreeToOneDisruptor
 {

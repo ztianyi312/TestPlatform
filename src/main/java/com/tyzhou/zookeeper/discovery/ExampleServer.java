@@ -1,14 +1,15 @@
 package com.tyzhou.zookeeper.discovery;
 
-import org.apache.curator.utils.CloseableUtils;
+import java.io.Closeable;
+import java.io.IOException;
+
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.utils.CloseableUtils;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.UriSpec;
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
-import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * This shows a very simplified method of registering an instance with the service discovery. Each individual

@@ -1,8 +1,5 @@
 package com.tyzhou.queue;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.LockSupport;
@@ -11,11 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.primitives.Longs;
-import com.lmax.disruptor.EventFactory;
-import com.lmax.disruptor.SleepingWaitStrategy;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
-import com.tyzhou.disruptor.ThreeToOneDisruptor.DataEvent;
 
 public class MultiToOneTest {
 
